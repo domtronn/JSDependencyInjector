@@ -1,0 +1,6 @@
+[
+    { "keys": ["ctrl+b"], "command": "inject_javascript_dependency_at_point" },
+		{ "keys": ["ctrl+shift+b"], "command": "update_javascript_dependencies" },
+		{ "keys": ["alt+shift+b"], "command": "sort_javascript_dependencies" }
+		
+]
