@@ -55,6 +55,9 @@ class JavascriptRegionResolver:
         ws_region = view.find("\n\s*", view.find("\s-*\[\s*", 0).end())
         
         return "," + view.substr(ws_region)
+
+    def getQuoteChar(self, view):
+        return '"' if len(view.find_all("\"")) > len(view.find_all("'")) else "'"
         
 class UpdateJavascriptDependenciesCommand(sublime_plugin.TextCommand):
     def run(self, edit):
@@ -194,14 +197,15 @@ class InjectDependenciesCommand(sublime_plugin.TextCommand):
                 
             # Construct/Manipulate the require path array by appending/inserting
             # the require path assossciated with the class name
+            quote_char = JavascriptRegionResolver().getQuoteChar(self.view)
             if replace:
-                require_path_array.append('"' + require_path + '"')
+                require_path_array.append(quote_char + require_path + quote_char)
             else:
                 # Replace the index 
                 index = re.split(",\s*", self.view.substr(class_name_region)).index(class_name)
                 if index == len(require_path_array):
                     require_path_array.append("")
-                require_path_array[index] = '"' + require_path + '"'
+                require_path_array[index] = quote_char + require_path + quote_char
                     
 
         # Calculate the white space that is used for indenting the require paths
