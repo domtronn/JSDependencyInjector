@@ -1,0 +1,21 @@
+/*
+ * This file is an example project file designed to work with the example project provided,
+ * You should replace the paths with the absolute path to this package if you want to try it
+ */
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": false,
+			"path": "/Users/{user}/.../JSDependencyInjector/example",
+			"name": "Example",
+			"id": "jsdependencyinjector"
+		},
+		{
+			"follow_symlinks": false,
+			"path": "/Users/{user}/.../JSDependencyInjector/example",
+			"name": "ExampleAgain",
+			"id": "lib"
+		}
+	]
+}
