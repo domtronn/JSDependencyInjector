@@ -193,8 +193,11 @@ class InjectDependenciesCommand(sublime_plugin.TextCommand):
             # If the class name is not present in the class name region
             # insert it and recalculate the region of class names
             if not class_name_region.intersects(self.view.find("[ ,(]"+class_name+"[,)]", 0)):
-                class_name_region.b += self.view.insert(edit, class_name_region.b, ", " + class_name)
-                
+                if class_name_region.b == class_name_region.a:
+                    class_name_region.b += self.view.insert(edit, class_name_region.b, class_name)
+                else:
+                    class_name_region.b += self.view.insert(edit, class_name_region.b, ", " + class_name)
+
             # Construct/Manipulate the require path array by appending/inserting
             # the require path assossciated with the class name
             quote_char = JavascriptRegionResolver().getQuoteChar(self.view)
