@@ -3,7 +3,7 @@ JSDependencyInjector
 
 A JavaScript Require.js _"dependency injection"_ package for Sublime.
 
-This package only works if you load __Projects__
+![alt example](https://raw.github.com/domtronn/JSDependencyInjector/master/example/example.gif)
 
 ## Installation
 
@@ -69,3 +69,5 @@ To get started, simply follow these steps:
 * Open ```example/example.sublime-project``` in Sublime  **( Project | Open Project )**
 * Open ```example/script/example.js```
 * Try out the key bindings to pull ```Image``` and ```Container``` into the class
+
+
