@@ -1,0 +1,18 @@
+[
+	{
+		"id": "edit",
+		"children":
+		[
+			{
+				"mnemonic": "J",
+				"id": "javascript",
+				"caption": "JavaScript",
+				"children":[
+					{"id": "sort"},
+					{ "command": "sort_javascript_dependencies" },
+					{ "command": "update_javascript_dependencies" }	
+				]
+			}
+		]
+	}
+]
