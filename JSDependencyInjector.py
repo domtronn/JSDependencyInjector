@@ -33,7 +33,8 @@ class JavascriptRegionResolver:
         return [el.strip() for el in view.substr(require_path_region).split(",")]
         
     def getRequirePathRegion (self, view):
-        start = view.find("\s-*\[\s*\n\s*", 0).end()
+        preStart = view.find("require\.def", 0).end()
+        start = view.find("\s-*\[\s*\n\s*", preStart).end()
         end = view.find("\s+\]", start).begin()
         
         return sublime.Region(start, end)
@@ -44,7 +45,8 @@ class JavascriptRegionResolver:
         return view.substr(class_name_region).split(", ")
 
     def getClassNameRegion (self, view):
-        start = view.find("function\s-*\(", 0).end()
+        preStart = view.find("require\.def", 0).end()
+        start = view.find("function\s-*\(", preStart).end()
         end = view.find("\)", start).begin()
         
         return sublime.Region(start, end)
