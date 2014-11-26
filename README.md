@@ -1,7 +1,7 @@
 JSDependencyInjector
 ====================
 
-A JavaScript Require.js dependency injector package for Sublime.
+A JavaScript Require.js _"dependency injection"_ package for Sublime.
 
 This package only works if you load __Projects__
 
@@ -13,11 +13,11 @@ Place the contents of this project inside your Sublime plugins folder.
 * __Windows__ ```???```
 * __Linux__ ```???```
 
-You can find the location of your plugins folder by going to **( Preferences | Browse Packages... )**
+You can find the location of your plugins folder by going to **( Preferences | Browse Packages... )** in Sublime
 
 ## Setup
 
-You will need to load a project file, this should be a JSON object and _must_ include the following:
+You will need to load a project file, this should be a JSON file called ```<name>.sublime-project``` and _must_ include the following:
 ```json
 {
     "folders":
@@ -37,7 +37,7 @@ You will need to load a project file, this should be a JSON object and _must_ in
 	]
 }
 ```
-( _**N.B.** Sublime does support relative paths, i.e. ```~``` to denote the ```HOME```, you must use **absolute** paths in the fields above_ )
+( _**N.B.** Sublime does not support relative paths, i.e. ```~``` to denote the ```HOME```, you must use **absolute** paths in the fields above_ )
 
 This tells the plugin where to find the javascript files as dependencies.
 It also replaces the root of the scripts folder with the id of the project _(i.e the require paths mapping)_.
@@ -52,12 +52,11 @@ In the example json above, this would change the following
 
 The key bindings are defined in ```Default (OS).sublime-keymap``` and can be changed to whatever binding you want, the default bindings are as follows
 
-| Function Name                                  | MacOS           | Windows          | Description                                                                                                            |
-| :-------                                  | --------------------  | -------          |                                                                                                                        |
-| ```InjectJavascriptDependencyAtPoint```   | __Cmd__+__B__         | __Ctrl__+__B__         | _Attempts to inject the Class under the cursor point_                                                                  |
+| Function Name                             | MacOS                   | Windows                  | Description                                                                                                            |
+| :-------                                  | --------------------    | -------                  |                                                                                                                        |
+| ```InjectJavascriptDependencyAtPoint```   | __Cmd__+__B__           | __Ctrl__+__B__           | _Attempts to inject the Class under the cursor point_                                                                  |
 | ```UpdateJavascriptDependenciesCommand``` | __Cmd__+__Shift__+__B__ | __Ctrl__+__Shift__+__B__ | _Goes through each of the Classes in the function argument list and injects them into the require block_               |
 | ```SortJavascriptDependencies```          | __Alt__+__Shift__+__B__ | __Alt__+__Shift__+__B__  | _Orders the paths in the Require block alphabetically and rearranges the Classes in the function argument accordingly_ |
-|                                           |                 |                  |                                                                                                                        |
 
 ## Example
 
