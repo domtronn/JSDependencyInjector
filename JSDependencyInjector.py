@@ -1,4 +1,4 @@
-import sublime, sublime_plugin, os
+import sublime, sublime_plugin, os, re
 
 class OnJavascriptWindowLoad(sublime_plugin.EventListener):
     def on_load(self, view):
@@ -198,7 +198,7 @@ class InjectDependenciesCommand(sublime_plugin.TextCommand):
                 require_path_array.append('"' + require_path + '"')
             else:
                 # Replace the index 
-                index = self.view.substr(class_name_region).split(", ").index(class_name)
+                index = re.split(",\s*", self.view.substr(class_name_region)).index(class_name)
                 if index == len(require_path_array):
                     require_path_array.append("")
                 require_path_array[index] = '"' + require_path + '"'
