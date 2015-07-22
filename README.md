@@ -59,7 +59,7 @@ The key bindings are defined in ```Default (OS).sublime-keymap``` and can be cha
 Function Name  | MacOS  | Windows | Description
  :---|:---:|:---:|:----
  ```InjectJavascriptDependencyAtPoint``` | __Cmd__+__B__ | __Ctrl__+__B__ | _Attempts to inject the Class/Module under the cursor point_
- ```InjectRelativeAtPoint``` | __Cmd__+__Alt__+__B__ | _N/a_ | _N/A_ | _Attempts to inject the Class/Module under the cursor point as a relative module_
+ ```InjectRelativeAtPoint``` | __Cmd__+__Alt__+__B__ | _N/a_ | _Attempts to inject the Class/Module under the cursor point as a relative module_
 ```UpdateJavascriptDependenciesCommand``` | __Cmd__+__Shift__+__B__ | __Ctrl__+__Shift__+__B__ | _Goes through each of the Classes in the function argument list and injects them into the require block_ 
 ```SortJavascriptDependencies``` | __Alt__+__Shift__+__B__ | __Alt__+__Shift__+__B__  | _Orders the paths in the Require block alphabetically and rearranges the Classes in the function argument accordingly_
 
