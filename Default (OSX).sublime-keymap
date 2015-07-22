@@ -1,6 +1,6 @@
 [
     { "keys": ["super+b"], "command": "inject_javascript_dependency_at_point" },
+    { "keys": ["alt+super+b"], "command": "inject_relative_at_point" },
 		{ "keys": ["super+shift+b"], "command": "update_javascript_dependencies" },
 		{ "keys": ["alt+shift+b"], "command": "sort_javascript_dependencies" }
-		
 ]
