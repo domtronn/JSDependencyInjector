@@ -3,6 +3,8 @@ JSDependencyInjector
 
 A JavaScript Require.js and Local Module _"dependency injection"_ package for Sublime.
 
+![alt example](https://raw.github.com/domtronn/JSDependencyInjector/master/example/example.gif)
+
 This package only works if you load __Sublime Projects__
 
 ## Installation
