@@ -78,3 +78,5 @@ To get started, simply follow these steps:
 
 - [ ] Use a projects `package.json` to auto complete node modules
 - [ ] Use a projects `.gitignore` to filter out paths/files
+- [ ] Allow for package sub modules to be required in situ
+- [ ] Bug fix injection into require block if not set up that way
