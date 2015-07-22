@@ -2,29 +2,39 @@ import sublime, sublime_plugin, os, re
 
 class OnJavascriptWindowLoad(sublime_plugin.EventListener):
     def on_load(self, view):
-        view.settings().set('js_dependency_dict', self.update_dependency_dict())
+        self.update_dependency_dict(view)
 
     def on_post_save(self, view):
-        view.settings().set('js_dependency_dict', self.update_dependency_dict())
+        self.update_dependency_dict(view)
 
-    def update_dependency_dict(self):
+    def insert_to_dict(self, elt, result, dictionary):
+        if elt in dictionary:
+            dictionary[elt].append(result)
+        else:
+            dictionary[elt] = [result]
+
+    def update_dependency_dict(self, view):
         dependency_dict = { }
+        relative_dict = { }
         for project_folder in sublime.active_window().project_data()['folders']:
             project_id = project_folder['id']
             for root, dirs, files in os.walk(project_folder['path']):
                 for name in files:
+                    src_root = "/" + (project_folder["src_root"] or "script") + "/"
                     if (os.path.splitext(name)[1] == ".js"
-                        and "/script/" in os.path.join(root, name)
+                        and src_root in os.path.join(root, name)
+                        and "node_modules" not in os.path.join(root, name)
                         and "Spec" not in os.path.splitext(name)[0]):
 
                         assoc_path = os.path.join(root, os.path.splitext(name)[0])
-                        assoc_result = project_id + "/" + assoc_path.split("/script/")[1]
-                        if os.path.splitext(name)[0].lower() in dependency_dict:
-                            dependency_dict[os.path.splitext(name)[0].lower()].append(assoc_result)
-                        else:
-                            dependency_dict[os.path.splitext(name)[0].lower()] = [assoc_result]
-        return dependency_dict
+                        assoc_result = project_id + "/" + assoc_path.split(src_root)[1]
+                        assoc_name = os.path.splitext(name)[0].lower()
 
+                        self.insert_to_dict(assoc_name, assoc_result, dependency_dict)
+                        self.insert_to_dict(assoc_name, assoc_path, relative_dict)
+        view.settings().set('js_dependency_dict', dependency_dict)
+        view.settings().set('js_relative_dict', relative_dict)
+    
 class JavascriptRegionResolver:
     def getRequirePathArray (self, view):
         require_path_region = self.getRequirePathRegion(view)
@@ -75,7 +85,7 @@ class UpdateJavascriptDependenciesCommand(sublime_plugin.TextCommand):
         self.results = []
         # Get the region containing class names and split into array
         self.class_name_array = JavascriptRegionResolver().getClassNameArray(self.view)
-
+        
         # Construct an array of require path choices from matching class names
         # to the dependency assossciative list
         self.require_path_choices = []
@@ -158,6 +168,60 @@ class InjectJavascriptDependencyAtPointCommand(sublime_plugin.TextCommand):
             }
         )
 
+class InjectRelativeAtPointCommand(sublime_plugin.TextCommand):
+    def run(self, edit):
+        relative_dict = self.view.settings().get('js_relative_dict')
+        if not relative_dict:
+            sublime.message_dialog('No project settings were found\nCould not find any dependency mappings')
+            return
+
+        # Get the word under point
+        self.class_name = ""
+        for region in self.view.sel():
+            if region.begin() == region.end():
+                word = self.view.word(region)
+            if not word.empty():
+                self.class_name = self.view.substr(word)
+
+        # Break if the class is not found in any dependent project
+        if self.class_name.lower() not in relative_dict :
+            sublime.message_dialog('"'+self.class_name+'" was not found in any of your dependent projects.')
+            return
+        
+        file_dir = os.path.dirname(self.view.file_name())
+        self.require_path_array = relative_dict[self.class_name.lower()]
+        self.require_path_array[:] = [ os.path.relpath( f, file_dir ) for f in self.require_path_array ]
+
+        print(self.require_path_array)
+        
+        if len(self.require_path_array) > 1:
+            sublime.active_window().show_quick_panel(self.require_path_array, self.injectClassIndex)
+        else:
+            self.injectClassIndex(0)
+
+    def injectClassIndex(self, index):
+        # Return if user cancels quick panel
+        if index == -1:
+            return
+        
+        result = self.require_path_array[index]
+        if re.match('^[a-zA-Z]', self.require_path_array[index]):
+            result = "./" + result
+        
+        self.view.run_command(
+            "inject_at_point",
+            {
+                "require_path": result
+            }
+        )
+            
+class InjectAtPoint(sublime_plugin.TextCommand):
+    def run(self, edit, require_path):
+        quote_char = JavascriptRegionResolver().getQuoteChar(self.view)
+        print(require_path)
+        result = quote_char + require_path + quote_char
+        self.view.replace(edit, self.view.word(self.view.sel()[0]), result)
+        
 class SortJavascriptDependencies(sublime_plugin.TextCommand):
     def run(self, edit):
         require_path_array = JavascriptRegionResolver().getRequirePathArray(self.view)
