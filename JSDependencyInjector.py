@@ -278,7 +278,6 @@ class InjectDependenciesCommand(sublime_plugin.TextCommand):
             require_path_array = JavascriptRegionResolver().getRequirePathArray(self.view)
 
         class_name_region = JavascriptRegionResolver().getClassNameRegion(self.view)
-        print(class_name_region)
         if class_name_region.begin() < 0:
             sublime.message_dialog('This JavaScript file does not follow the require.js definition format')
             return
@@ -310,7 +309,5 @@ class InjectDependenciesCommand(sublime_plugin.TextCommand):
         # Calculate the white space that is used for indenting the require paths
         # so that formatting remains the same
         require_path_region = JavascriptRegionResolver().getRequirePathRegion(self.view)
-        
-        print(require_path_region)
         
         self.view.replace (edit, require_path_region, JavascriptRegionResolver().formatRequireBlock(self.view, require_path_array))
