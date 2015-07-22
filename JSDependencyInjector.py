@@ -42,8 +42,8 @@ class JavascriptRegionResolver:
         return [el.strip() for el in view.substr(require_path_region).split(",")]
 
     def getRequirePathRegion (self, view):
-        preStart = view.find("require\.def", 0).end()
-        start = view.find("\s-*\[\s*\n", preStart).end()
+        preStart = view.find("require", 0).end()
+        start = view.find("[\s\s-]*\[[\s\s-]*", preStart).end()
         end = view.find("\]", start).begin()
 
         return sublime.Region(start, end)
@@ -54,14 +54,14 @@ class JavascriptRegionResolver:
         return view.substr(class_name_region).split(", ")
 
     def getClassNameRegion (self, view):
-        preStart = view.find("require\.def", 0).end()
-        start = view.find("function\s-*\(", preStart).end()
+        preStart = view.find("require", 0).end()
+        start = view.find("function\s*\(", preStart).end()
         end = view.find("\)", start).begin()
 
         return sublime.Region(start, end)
 
     def getWhiteSpaceChar (self, view):
-        ws_region = view.find("\s-*\[", view.find("require\.def", 0).end())
+        ws_region = view.find("\s-*\[", view.find("require", 0).end())
         ws_region.b -= 1
 
         return view.substr(ws_region)
@@ -262,8 +262,8 @@ class SortJavascriptDependencies(sublime_plugin.TextCommand):
 
         # Replace the old regions with the new ordered ones
         require_path_region = JavascriptRegionResolver().getRequirePathRegion(self.view)
-        class_name_region = JavascriptRegionResolver().getClassNameRegion(self.view)
         self.view.replace (edit, require_path_region, JavascriptRegionResolver().formatRequireBlock(self.view, ordered_require_path_array))
+        class_name_region = JavascriptRegionResolver().getClassNameRegion(self.view)
         self.view.replace (edit, class_name_region, ", ".join(ordered_class_name_array))
 
 class InjectDependenciesCommand(sublime_plugin.TextCommand):
@@ -278,6 +278,11 @@ class InjectDependenciesCommand(sublime_plugin.TextCommand):
             require_path_array = JavascriptRegionResolver().getRequirePathArray(self.view)
 
         class_name_region = JavascriptRegionResolver().getClassNameRegion(self.view)
+        print(class_name_region)
+        if class_name_region.begin() < 0:
+            sublime.message_dialog('This JavaScript file does not follow the require.js definition format')
+            return
+            
         for index, require_path in enumerate(require_paths):
             class_name = class_names[index]
 
@@ -305,4 +310,7 @@ class InjectDependenciesCommand(sublime_plugin.TextCommand):
         # Calculate the white space that is used for indenting the require paths
         # so that formatting remains the same
         require_path_region = JavascriptRegionResolver().getRequirePathRegion(self.view)
+        
+        print(require_path_region)
+        
         self.view.replace (edit, require_path_region, JavascriptRegionResolver().formatRequireBlock(self.view, require_path_array))
