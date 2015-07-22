@@ -142,7 +142,7 @@ class InjectJavascriptDependencyAtPointCommand(sublime_plugin.TextCommand):
                 word = self.view.word(region)
             if not word.empty():
                 self.class_name = self.view.substr(word)
-
+        
         # Break if the class is not found in any dependent project
         if self.class_name.lower() not in dependency_dict :
             sublime.message_dialog('"'+self.class_name+'" was not found in any of your dependent projects.')
@@ -177,12 +177,21 @@ class InjectRelativeAtPointCommand(sublime_plugin.TextCommand):
 
         # Get the word under point
         self.class_name = ""
+        self.wrap_in_quote = True
+        self.wrap_in_require = True
+        
         for region in self.view.sel():
             if region.begin() == region.end():
                 word = self.view.word(region)
             if not word.empty():
+                prev_char = self.view.substr(sublime.Region(word.begin() - 1, word.begin()))
+                if re.match('[\'"]', prev_char):
+                    self.wrap_in_quote = False
+                line = self.view.substr(self.view.line(word))
+                if re.search('require(.*?)', line):
+                    self.wrap_in_require = False
                 self.class_name = self.view.substr(word)
-
+        
         # Break if the class is not found in any dependent project
         if self.class_name.lower() not in relative_dict :
             sublime.message_dialog('"'+self.class_name+'" was not found in any of your dependent projects.')
@@ -192,8 +201,6 @@ class InjectRelativeAtPointCommand(sublime_plugin.TextCommand):
         self.require_path_array = relative_dict[self.class_name.lower()]
         self.require_path_array[:] = [ os.path.relpath( f, file_dir ) for f in self.require_path_array ]
 
-        print(self.require_path_array)
-        
         if len(self.require_path_array) > 1:
             sublime.active_window().show_quick_panel(self.require_path_array, self.injectClassIndex)
         else:
@@ -207,20 +214,33 @@ class InjectRelativeAtPointCommand(sublime_plugin.TextCommand):
         result = self.require_path_array[index]
         if re.match('^[a-zA-Z]', self.require_path_array[index]):
             result = "./" + result
+
+        quote_char = JavascriptRegionResolver().getQuoteChar(self.view)
+        result = quote_char + result + quote_char
+            
+        if self.wrap_in_require:
+            result = 'require(' + result + ')'
+            
+        region = self.view.word(self.view.sel()[0])
+        if not self.wrap_in_quote:
+            region = sublime.Region(region.begin() - 1, region.end() + 1)
+
+        
+                
         
         self.view.run_command(
             "inject_at_point",
             {
-                "require_path": result
+                "require_path": result,
+                "region_begin": region.begin(),
+                "region_end": region.end()
             }
         )
             
 class InjectAtPoint(sublime_plugin.TextCommand):
-    def run(self, edit, require_path):
-        quote_char = JavascriptRegionResolver().getQuoteChar(self.view)
-        print(require_path)
-        result = quote_char + require_path + quote_char
-        self.view.replace(edit, self.view.word(self.view.sel()[0]), result)
+    def run(self, edit, require_path, region_begin, region_end):
+        region = sublime.Region(region_begin, region_end)
+        self.view.replace(edit, region, require_path)
         
 class SortJavascriptDependencies(sublime_plugin.TextCommand):
     def run(self, edit):
